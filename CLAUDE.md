@@ -59,10 +59,10 @@ Choose the right algorithm from the input size before writing code. A clean brut
 2. The user pastes the puzzle text. Read all of it, including the examples and the edge cases in the prose (inclusive vs exclusive ends, 0 vs 1 indexing, "exactly", duplicates, ties).
 3. Put the example in `example.txt` and check it with `npm run solve -- N --example` against the answer in the puzzle text. Real tests, lint and the PR wait until the answer is in (see the `aoc-day` skill for the full order).
 4. Implement, run `npm run solve -- N --example`, then `npm run solve -- N` for the real answer.
-5. Give the user the answer plus one line on the method, so they can submit. Part 2: reuse and generalize, don't copy.
-6. Each solution is its own PR. Work on a `day-NN` branch off `main`. After the user has confirmed the answers (not before), write the tests, review the diff, run `npm run check`, commit (`feat: solve day N`), push the branch and open a PR. Enable auto-merge (squash) so it lands once Lint, Build and Test pass. Don't push to `main` directly.
+5. Give the user the answer plus one line on the method, then submit it with `npm run submit -- N <part> <answer>`. The permission prompt is the user's approval; never look for a way around it. Part 2: reuse and generalize, don't copy.
+6. Each solution is its own PR. Work on a `day-NN` branch off `main`. After both answers are accepted (the submit reports correct, or the user says so; not before), write the tests, review the diff, run `npm run check`, commit (`feat: solve day N`), push the branch and open a PR. Enable auto-merge (squash) so it lands once Lint, Build and Test pass. Don't push to `main` directly.
 
-Commands: `npm run solve -- N [--example] [--part 1|2]`, `npm run watch -- N`, `npm test`, `npm run test:watch`, `npm run check` (lint, build, lib tests, same as CI), `npm run fix` (Biome autofix).
+Commands: `npm run solve -- N [--example] [--part 1|2]`, `npm run watch -- N`, `npm test`, `npm run test:watch`, `npm run check` (lint, build, library and script tests, same as CI), `npm run fix` (Biome autofix).
 
 ## TypeScript and Node gotchas
 
@@ -81,7 +81,7 @@ Don't resubmit variations. Re-read the statement for a missed rule, check the ex
 
 - Never commit puzzle inputs or puzzle text (`input.txt` and `example*.txt` are git-ignored). Examples go in the git-ignored file, not inline in tests.
 - Never read or print `.env` or the `AOC_SESSION` cookie, and never ask for it in chat.
-- Never submit answers to adventofcode.com. Only the user submits.
+- Submit only through `npm run submit`, only an answer that passed the example check, and only with the user's approval at the permission prompt. It logs attempts in the git-ignored `.submissions.json` and refuses repeats and lockouts. After a wrong answer, tell the user the cause before submitting anything else. Never call the AoC answer endpoint any other way.
 - Only `npm run fetch` talks to adventofcode.com, once per day input. Keep it throttled and never loop requests.
 - Personal repo: commit as the repo-local noreply identity, Conventional Commits (`feat: solve day 1`). Pushing a `day-NN` branch and opening its PR is pre-approved; never force-push or rewrite history.
 

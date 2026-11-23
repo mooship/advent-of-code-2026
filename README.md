@@ -18,9 +18,10 @@ Commits should use your GitHub noreply address: `git config --local user.email <
 npm install
 npm run new -- 1           # scaffold src/days/day01
 npm run fetch -- 1         # download input (needs AOC_SESSION in .env, see .env.example)
+npm run submit -- 1 1 42   # submit an answer for day 1 part 1 (asks for permission)
 npm run solve -- 1         # run both parts on input.txt; add --example for example.txt
 npm run watch -- 1         # same, re-running on save
-npm run check              # lint, build (tsc) and lib tests, same as CI
+npm run check              # lint, build (tsc) and library and script tests, same as CI
 ```
 
 Puzzle inputs and example text are git-ignored, as Advent of Code asks.

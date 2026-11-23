@@ -1,6 +1,7 @@
 node_modules/
 coverage/
 .env
+.submissions.json
 
 # AoC asks that puzzle inputs and puzzle text are not shared
 input.txt
