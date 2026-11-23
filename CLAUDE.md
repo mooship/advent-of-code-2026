@@ -57,10 +57,10 @@ Choose the right algorithm from the input size before writing code. A clean brut
 
 1. `npm run new -- N` scaffolds `src/days/dayNN/` (`solution.ts`, `solution.test.ts`, `example.txt`). Input is fetched with `npm run fetch -- N` (the user usually does this themselves).
 2. The user pastes the puzzle text. Read all of it, including the examples and the edge cases in the prose (inclusive vs exclusive ends, 0 vs 1 indexing, "exactly", duplicates, ties).
-3. Put the example in `example.txt` and the expected answer in the test (remove `.todo`). Make it fail first.
+3. Put the example in `example.txt` and check it with `npm run solve -- N --example` against the answer in the puzzle text. Real tests, lint and the PR wait until the answer is in (see the `aoc-day` skill for the full order).
 4. Implement, run `npm run solve -- N --example`, then `npm run solve -- N` for the real answer.
 5. Give the user the answer plus one line on the method, so they can submit. Part 2: reuse and generalize, don't copy.
-6. Each solution is its own PR. Work on a `day-NN` branch off `main`. After the user has submitted (not before), run `npm run check`, commit (`feat: solve day N`), push the branch and open a PR. Enable auto-merge (squash) so it lands once Lint, Build and Test pass. Don't push to `main` directly.
+6. Each solution is its own PR. Work on a `day-NN` branch off `main`. After the user has confirmed the answers (not before), write the tests, review the diff, run `npm run check`, commit (`feat: solve day N`), push the branch and open a PR. Enable auto-merge (squash) so it lands once Lint, Build and Test pass. Don't push to `main` directly.
 
 Commands: `npm run solve -- N [--example] [--part 1|2]`, `npm run watch -- N`, `npm test`, `npm run test:watch`, `npm run check` (lint, build, lib tests, same as CI), `npm run fix` (Biome autofix).
 

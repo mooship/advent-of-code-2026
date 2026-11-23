@@ -6,7 +6,13 @@ My [Advent of Code 2026](https://adventofcode.com/2026) solutions, in TypeScript
 
 ## Usage
 
-Needs [fnm](https://github.com/Schniz/fnm) (or any Node 26). `.node-version` selects Node 26.
+Needs [fnm](https://github.com/Schniz/fnm) (or any Node 26). `.node-version` selects Node 26. On macOS: `brew install fnm`, then add this to `~/.zshrc` so the shell switches Node per repo:
+
+```sh
+eval "$(fnm env --use-on-cd --version-file-strategy recursive --shell zsh)"
+```
+
+Commits should use your GitHub noreply address: `git config --local user.email <id>+<user>@users.noreply.github.com`.
 
 ```sh
 npm install
