@@ -14,10 +14,11 @@
 	"scripts": {
 		"new": "node scripts/new.ts",
 		"fetch": "node scripts/fetch.ts",
+		"submit": "node scripts/submit.ts",
 		"solve": "node scripts/run.ts",
 		"watch": "node --watch scripts/run.ts",
 		"test": "vitest run",
-		"test:ci": "vitest run src/lib",
+		"test:ci": "vitest run src/lib scripts",
 		"test:watch": "vitest",
 		"build": "tsc --noEmit",
 		"lint": "biome check",
