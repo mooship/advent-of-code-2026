@@ -60,7 +60,7 @@ Choose the right algorithm from the input size before writing code. A clean brut
 3. Put the example in `example.txt` and the expected answer in the test (remove `.todo`). Make it fail first.
 4. Implement, run `npm run solve -- N --example`, then `npm run solve -- N` for the real answer.
 5. Give the user the answer plus one line on the method, so they can submit. Part 2: reuse and generalize, don't copy.
-6. After submitting (not before), run `npm run check` and commit.
+6. Each solution is its own PR. Work on a `day-NN` branch off `main`. After the user has submitted (not before), run `npm run check`, commit (`feat: solve day N`), push the branch and open a PR. Enable auto-merge (squash) so it lands once Lint, Build and Test pass. Don't push to `main` directly.
 
 Commands: `npm run solve -- N [--example] [--part 1|2]`, `npm run watch -- N`, `npm test`, `npm run test:watch`, `npm run check` (lint, build, lib tests, same as CI), `npm run fix` (Biome autofix).
 
@@ -83,7 +83,7 @@ Don't resubmit variations. Re-read the statement for a missed rule, check the ex
 - Never read or print `.env` or the `AOC_SESSION` cookie, and never ask for it in chat.
 - Never submit answers to adventofcode.com. Only the user submits.
 - Only `npm run fetch` talks to adventofcode.com, once per day input. Keep it throttled and never loop requests.
-- Personal repo: commit as the repo-local noreply identity, Conventional Commits (`feat: solve day 1`). Don't push unless asked.
+- Personal repo: commit as the repo-local noreply identity, Conventional Commits (`feat: solve day 1`). Pushing a `day-NN` branch and opening its PR is pre-approved; never force-push or rewrite history.
 
 ## Style of replies during a race
 
