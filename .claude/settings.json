@@ -9,7 +9,18 @@
 			"Bash(npm run lint)",
 			"Bash(npm run fix)",
 			"Bash(npm run build)",
-			"Bash(npm run check)"
+			"Bash(npm run check)",
+			"Bash(git status)",
+			"Bash(git diff *)",
+			"Bash(git log *)",
+			"Bash(git switch *)",
+			"Bash(git pull --ff-only)",
+			"Bash(git add *)",
+			"Bash(git commit *)",
+			"Bash(git push -u origin day-*)",
+			"Bash(gh pr create *)",
+			"Bash(gh pr view *)",
+			"Bash(gh pr merge --auto --squash)"
 		],
 		"ask": ["Bash(npm run submit *)"]
 	}
