@@ -6,8 +6,8 @@ TypeScript on Node 26, Biome, Vitest. This is a race: the goal is the fastest co
 
 1. **Right thing, right way, cleanly.** Solve the actual problem with the appropriate algorithm and write it properly the first time. No hacks, no "fix it later", no throwaway code that stays.
 2. **Correct on the first submit.** A wrong answer locks submissions for a growing time penalty. Never guess: pass the example, re-read the statement, then run the real input.
-3. **Speed comes from clarity.** Read the whole puzzle first, name the concepts in it, model them, then code. Don't gold-plate: build only what this puzzle needs, and use `src/lib` before writing a helper.
-4. **Part 2 is usually a twist on part 1.** Keep the model general (parameters, not hardcoded values) so part 2 is a small change, not a rewrite.
+3. **Speed comes from clarity.** Read the whole puzzle first, name the concepts in it, model them, then code. Use `src/lib` before writing a helper.
+4. **Part 2 is usually a twist on part 1, but you haven't seen it yet.** Model the puzzle's real concepts and pass the obvious puzzle numbers (sizes, step counts) as arguments, so a twist is a small change. Do not guess at what part 2 will ask or build for it in advance.
 
 ## Clean code rules
 
@@ -20,6 +20,22 @@ TypeScript on Node 26, Biome, Vitest. This is a race: the goal is the fastest co
 - No dead code, commented-out code, or debug `console.log` left behind. Comments only for a non-obvious why (a puzzle rule, an invariant, an AoC quirk), never to narrate the code.
 - No `any`, no non-null `!` to silence the compiler, no `@ts-ignore`. Fix the type.
 - Prefer clear expressions (`map`/`filter`/`reduce`, `for...of`) over index juggling, unless a hot loop needs otherwise and you have measured it.
+
+## Design judgement
+
+These ideas matter here, but each one is applied only when the puzzle gives a concrete reason. Never add structure to honour a principle.
+
+**Build the simplest thing that solves the puzzle as stated.** The simplest correct solution is also the quickest to write and the easiest to trust. Cleverness is for when the input size forces it. If two designs both work, take the one a reader follows in a single pass.
+
+**Nothing speculative, and this is the rule that matters most in a race.** No options nobody asked for, no generic frameworks, no interface with a single implementation, no helper "for later", no handling of inputs the puzzle says cannot occur. Part 2 is unlocked only after part 1 is solved, and small, well-shaped code is cheap to change then. The same goes for `src/lib`: it was seeded once with helpers that come up nearly every year, and it only grows when a helper has been needed twice. Write it in the day's own file first.
+
+**Give each function one reason to change.** Parsing changes when the input format does, the solving logic when the puzzle's rules do, and `part1`/`part2` when how the parts differ does. Keeping these apart is what lets part 2 be a small edit.
+
+**Grow by adding, not by rewriting.** When part 2 changes a rule, the shape that survives is the old code left alone plus the changed rule passed in as a function or parameter, or one more variant of a small union type. Introduce that seam at the moment the second variant actually appears, not before. When variants share a type, every variant must honour the same contract, so callers never special-case one.
+
+**Depend on the narrowest thing that works.** Functions take the smallest data they need (a `Point[]`, not the whole parsed state) and take behaviour as a function (as `bfs` takes `next`, not a `Grid` class). Prefer plain functions and plain types over classes and inheritance. Reach for a class only for a data structure with real internal invariants, like a priority queue.
+
+**When these pull against each other:** correct first, then simple and nothing speculative, then flexible. Flexibility loses every tie.
 
 ## Speed of the program
 
