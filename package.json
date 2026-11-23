@@ -1,0 +1,33 @@
+{
+	"name": "advent-of-code-2026",
+	"version": "0.0.0",
+	"private": true,
+	"description": "Advent of Code 2026 solutions in TypeScript on Node 26",
+	"license": "MIT",
+	"type": "module",
+	"engines": {
+		"node": ">=26"
+	},
+	"imports": {
+		"#lib/*": "./src/lib/*"
+	},
+	"scripts": {
+		"new": "node scripts/new.ts",
+		"fetch": "node scripts/fetch.ts",
+		"solve": "node scripts/run.ts",
+		"watch": "node --watch scripts/run.ts",
+		"test": "vitest run",
+		"test:ci": "vitest run src/lib",
+		"test:watch": "vitest",
+		"build": "tsc --noEmit",
+		"lint": "biome check",
+		"fix": "biome check --write",
+		"check": "npm run lint && npm run build && npm run test:ci"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.6.8",
+		"@types/node": "^26.6.6",
+		"typescript": "^7.0.2",
+		"vitest": "^5.1.1"
+	}
+}

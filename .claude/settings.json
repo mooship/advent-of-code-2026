@@ -1,0 +1,15 @@
+{
+	"permissions": {
+		"allow": [
+			"Bash(npm run new *)",
+			"Bash(npm run solve *)",
+			"Bash(npm run test)",
+			"Bash(npm run test -- *)",
+			"Bash(npm run test:ci)",
+			"Bash(npm run lint)",
+			"Bash(npm run fix)",
+			"Bash(npm run build)",
+			"Bash(npm run check)"
+		]
+	}
+}

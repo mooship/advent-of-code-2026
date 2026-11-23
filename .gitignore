@@ -1,0 +1,10 @@
+node_modules/
+coverage/
+.env
+
+# AoC asks that puzzle inputs and puzzle text are not shared
+input.txt
+example*.txt
+
+.claude/settings.local.json
+.claude/worktrees/
