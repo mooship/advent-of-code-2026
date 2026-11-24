@@ -2,16 +2,7 @@ import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { dayDir, parseDay, YEAR } from "./paths.ts";
 
-const day = parseDay(process.argv[2]);
-const dir = dayDir(day);
-const label = String(day).padStart(2, "0");
-
-if (existsSync(dir)) {
-	console.error(`day${label} already exists`);
-	process.exit(1);
-}
-
-const solution = `import { lines } from "#lib/input.ts";
+const SOLUTION = `import { lines } from "#lib/input.ts";
 import type { Answer } from "#lib/types.ts";
 
 function parse(input: string) {
@@ -29,7 +20,7 @@ export function part2(input: string): Answer {
 }
 `;
 
-const test = `import { readFileSync } from "node:fs";
+const testStub = (label: string) => `import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { part1, part2 } from "./solution.ts";
 
@@ -48,10 +39,23 @@ describe("day ${label}", () => {
 });
 `;
 
-mkdirSync(dir, { recursive: true });
-writeFileSync(join(dir, "solution.ts"), solution);
-writeFileSync(join(dir, "solution.test.ts"), test);
-writeFileSync(join(dir, "example.txt"), "");
+/** Creates a day's solution, test stub and empty example in `dir`; returns false when `dir` already exists. */
+export function scaffoldDay(day: number, dir: string = dayDir(day)): boolean {
+	if (existsSync(dir)) return false;
+	mkdirSync(dir, { recursive: true });
+	writeFileSync(join(dir, "solution.ts"), SOLUTION);
+	writeFileSync(join(dir, "solution.test.ts"), testStub(String(day).padStart(2, "0")));
+	writeFileSync(join(dir, "example.txt"), "");
+	return true;
+}
 
-console.log(`Created src/days/day${label}`);
-console.log(`Puzzle: https://adventofcode.com/${YEAR}/day/${day}`);
+if (import.meta.main) {
+	const day = parseDay(process.argv[2]);
+	const label = String(day).padStart(2, "0");
+	if (!scaffoldDay(day)) {
+		console.error(`day${label} already exists`);
+		process.exit(1);
+	}
+	console.log(`Created src/days/day${label}`);
+	console.log(`Puzzle: https://adventofcode.com/${YEAR}/day/${day}`);
+}
