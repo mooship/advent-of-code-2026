@@ -3,6 +3,10 @@
 		"allow": [
 			"Bash(npm run new *)",
 			"Bash(npm run solve *)",
+			"Bash(npm run watch *)",
+			"Bash(wc *)",
+			"Bash(head *)",
+			"Bash(git branch *)",
 			"Bash(npm run test)",
 			"Bash(npm run test -- *)",
 			"Bash(npm run test:ci)",
