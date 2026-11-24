@@ -14,6 +14,8 @@
 	"scripts": {
 		"prepare": "lefthook install",
 		"new": "node scripts/new.ts",
+		"start": "node scripts/start.ts",
+		"times": "node scripts/times.ts",
 		"fetch": "node scripts/fetch.ts",
 		"submit": "node scripts/submit.ts",
 		"solve": "node scripts/run.ts",

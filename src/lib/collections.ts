@@ -53,6 +53,66 @@ export class PriorityQueue<T> {
 	}
 }
 
+/**
+ * Disjoint groups of the items `0..size-1`. `find` compresses paths and `union` attaches the
+ * smaller group to the larger, so both are near constant time.
+ */
+export class UnionFind {
+	private readonly parent: number[];
+	private readonly groupSize: number[];
+	private groups: number;
+
+	constructor(size: number) {
+		this.parent = Array.from({ length: size }, (_, i) => i);
+		this.groupSize = new Array<number>(size).fill(1);
+		this.groups = size;
+	}
+
+	/** How many separate groups remain. */
+	get count(): number {
+		return this.groups;
+	}
+
+	/** The representative of the group holding `item`; equal for items in the same group. */
+	find(item: number): number {
+		let root = item;
+		while (this.parent[root] !== root) root = this.parent[root] as number;
+		let current = item;
+		while (current !== root) {
+			const next = this.parent[current] as number;
+			this.parent[current] = root;
+			current = next;
+		}
+		return root;
+	}
+
+	/** Joins the groups of `a` and `b`; false when they were already one group. */
+	union(a: number, b: number): boolean {
+		let rootA = this.find(a);
+		let rootB = this.find(b);
+		if (rootA === rootB) return false;
+		if ((this.groupSize[rootA] as number) < (this.groupSize[rootB] as number)) {
+			[rootA, rootB] = [rootB, rootA];
+		}
+		this.parent[rootB] = rootA;
+		this.groupSize[rootA] = (this.groupSize[rootA] as number) + (this.groupSize[rootB] as number);
+		this.groups--;
+		return true;
+	}
+
+	/** How many items are in the group holding `item`. */
+	sizeOf(item: number): number {
+		return this.groupSize[this.find(item)] as number;
+	}
+
+	/** The size of every group, in no particular order. */
+	sizes(): number[] {
+		return this.parent.flatMap((parent, item) =>
+			parent === item ? [this.groupSize[item] as number] : [],
+		);
+	}
+}
+
 /** A `Map` whose `get` creates and stores `make(key)` for a missing key instead of returning `undefined`. */
 export class DefaultMap<K, V> extends Map<K, V> {
 	private make: (key: K) => V;

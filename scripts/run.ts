@@ -1,7 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { pathToFileURL } from "node:url";
-import type { Solution } from "#lib/types.ts";
+import { runParts } from "./day.ts";
 import { dayDir, parseDay } from "./paths.ts";
 
 const args = process.argv.slice(2);
@@ -20,14 +19,7 @@ if (!existsSync(inputFile)) {
 }
 
 const input = readFileSync(inputFile, "utf8");
-const solution: { part1: Solution; part2: Solution } = await import(
-	pathToFileURL(join(dir, "solution.ts")).href
-);
-
-for (const part of [1, 2] as const) {
-	if (onlyPart !== undefined && onlyPart !== part) continue;
-	const start = performance.now();
-	const answer = await solution[part === 1 ? "part1" : "part2"](input);
-	const ms = (performance.now() - start).toFixed(1);
-	console.log(`part ${part}: ${answer}  (${ms} ms)`);
+const part = onlyPart === 1 || onlyPart === 2 ? onlyPart : undefined;
+for (const result of await runParts(join(dir, "solution.ts"), input, part)) {
+	console.log(`part ${result.part}: ${result.answer}  (${result.ms.toFixed(1)} ms)`);
 }
