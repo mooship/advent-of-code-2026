@@ -61,6 +61,25 @@ export function dijkstra<T>(
 	return -1;
 }
 
+/**
+ * The smallest integer in `low..high` (both included) for which `predicate` holds, assuming it is
+ * false up to some point and true from there on; `undefined` when it never holds.
+ */
+export function binarySearch(
+	low: number,
+	high: number,
+	predicate: (value: number) => boolean,
+): number | undefined {
+	let first = low;
+	let last = high + 1;
+	while (first < last) {
+		const middle = first + Math.floor((last - first) / 2);
+		if (predicate(middle)) last = middle;
+		else first = middle + 1;
+	}
+	return first > high ? undefined : first;
+}
+
 /** The state after `steps` applications of `step`, jumping over any cycle so `steps` may be huge. */
 export function iterate<T>(
 	start: T,

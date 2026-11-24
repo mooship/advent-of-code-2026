@@ -1,10 +1,20 @@
 import { describe, expect, it } from "vitest";
 import { chunk, combinations, pairs, permutations, transpose, windows } from "./arrays.ts";
-import { counter, DefaultMap, memoize, PriorityQueue } from "./collections.ts";
-import { DIRS8, findAll, inBounds, manhattan, neighbors } from "./grid.ts";
+import { counter, DefaultMap, memoize, PriorityQueue, UnionFind } from "./collections.ts";
+import {
+	DIRS6,
+	DIRS8,
+	findAll,
+	inBounds,
+	manhattan,
+	manhattan3,
+	neighbors,
+	prefixSums,
+	rectSum,
+} from "./grid.ts";
 import { digitGrid, grid, ints, lines, paragraphs } from "./input.ts";
 import { crt, gcd, lcm, mergeRanges, mod, product, range, sum } from "./math.ts";
-import { bfs, dijkstra, iterate, topologicalSort } from "./search.ts";
+import { bfs, binarySearch, dijkstra, iterate, topologicalSort } from "./search.ts";
 
 describe("input", () => {
 	it("splits lines and ignores CRLF and the trailing newline", () => {
@@ -273,5 +283,104 @@ describe("mergeRanges and crt and memoize", () => {
 		});
 		expect([square(3), square(3)]).toEqual([9, 9]);
 		expect(calls).toBe(1);
+	});
+});
+
+describe("UnionFind", () => {
+	it("starts with every item alone", () => {
+		const groups = new UnionFind(4);
+		expect(groups.count).toBe(4);
+		expect(groups.sizes()).toEqual([1, 1, 1, 1]);
+		expect(groups.find(2)).toBe(2);
+	});
+
+	it("merges groups, reporting whether anything changed", () => {
+		const groups = new UnionFind(5);
+		expect(groups.union(0, 1)).toBe(true);
+		expect(groups.union(1, 0)).toBe(false);
+		expect(groups.union(3, 4)).toBe(true);
+		expect(groups.count).toBe(3);
+		expect(groups.find(0)).toBe(groups.find(1));
+		expect(groups.find(0)).not.toBe(groups.find(3));
+	});
+
+	it("tracks group sizes", () => {
+		const groups = new UnionFind(6);
+		groups.union(0, 1);
+		groups.union(1, 2);
+		groups.union(4, 5);
+		expect(groups.sizeOf(2)).toBe(3);
+		expect(groups.sizeOf(3)).toBe(1);
+		expect(groups.sizes().sort((a, b) => b - a)).toEqual([3, 2, 1]);
+	});
+
+	it("handles a long chain without deep recursion", () => {
+		const length = 100_000;
+		const groups = new UnionFind(length);
+		for (let i = 1; i < length; i++) groups.union(i - 1, i);
+		expect(groups.count).toBe(1);
+		expect(groups.sizeOf(0)).toBe(length);
+		expect(groups.find(0)).toBe(groups.find(length - 1));
+	});
+});
+
+describe("binarySearch", () => {
+	it("finds the smallest value where the predicate holds", () => {
+		expect(binarySearch(0, 100, (n) => n * n >= 50)).toBe(8);
+		expect(binarySearch(-10, 10, (n) => n >= -3)).toBe(-3);
+	});
+
+	it("includes both ends of the range", () => {
+		expect(binarySearch(5, 9, () => true)).toBe(5);
+		expect(binarySearch(5, 9, (n) => n >= 9)).toBe(9);
+	});
+
+	it("returns undefined when the predicate never holds", () => {
+		expect(binarySearch(0, 10, () => false)).toBeUndefined();
+	});
+});
+
+describe("prefixSums and rectSum", () => {
+	const values = [
+		[1, 2, 3],
+		[4, 5, 6],
+		[7, 8, 9],
+	];
+	const sums = prefixSums(values);
+
+	it("sums any inclusive rectangle in constant time", () => {
+		expect(rectSum(sums, 0, 0, 2, 2)).toBe(45);
+		expect(rectSum(sums, 1, 1, 2, 2)).toBe(28);
+		expect(rectSum(sums, 0, 1, 1, 1)).toBe(9);
+		expect(rectSum(sums, 2, 0, 2, 0)).toBe(3);
+	});
+
+	it("matches a direct sum for every rectangle", () => {
+		for (let y0 = 0; y0 < 3; y0++) {
+			for (let x0 = 0; x0 < 3; x0++) {
+				for (let y1 = y0; y1 < 3; y1++) {
+					for (let x1 = x0; x1 < 3; x1++) {
+						const direct = sum(values.slice(y0, y1 + 1).flatMap((row) => row.slice(x0, x1 + 1)));
+						expect(rectSum(sums, x0, y0, x1, y1)).toBe(direct);
+					}
+				}
+			}
+		}
+	});
+
+	it("handles an empty grid", () => {
+		expect(prefixSums([])).toEqual([[0]]);
+	});
+});
+
+describe("3D points", () => {
+	it("has the six face-adjacent steps", () => {
+		expect(DIRS6).toHaveLength(6);
+		for (const step of DIRS6) expect(manhattan3([0, 0, 0], step)).toBe(1);
+		expect(new Set(DIRS6.map((step) => step.join(","))).size).toBe(6);
+	});
+
+	it("measures taxicab distance", () => {
+		expect(manhattan3([1, 2, 3], [4, -2, 3])).toBe(7);
 	});
 });

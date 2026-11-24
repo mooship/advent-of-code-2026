@@ -38,6 +38,55 @@ export function* neighbors(
 export const manhattan = (a: Point, b: Point): number =>
 	Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
 
+/** A position in 3D space as `[x, y, z]`. */
+export type Point3 = readonly [x: number, y: number, z: number];
+
+/** The six face-adjacent steps as `[dx, dy, dz]`. */
+export const DIRS6: readonly Point3[] = [
+	[1, 0, 0],
+	[-1, 0, 0],
+	[0, 1, 0],
+	[0, -1, 0],
+	[0, 0, 1],
+	[0, 0, -1],
+];
+
+/** Taxicab distance in 3D: `|dx| + |dy| + |dz|`. */
+export const manhattan3 = (a: Point3, b: Point3): number =>
+	Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]) + Math.abs(a[2] - b[2]);
+
+/**
+ * Running totals of `values` indexed `[y][x]`, padded with a zero row and column so
+ * `prefix[y][x]` is the sum of everything above and left of `(x, y)`. Feed it to `rectSum`.
+ */
+export const prefixSums = (values: readonly (readonly number[])[]): number[][] => {
+	const width = values[0]?.length ?? 0;
+	const prefix = [new Array<number>(width + 1).fill(0)];
+	for (const [y, row] of values.entries()) {
+		const above = prefix[y] as number[];
+		let rowTotal = 0;
+		prefix.push(
+			[0, ...row].map((_, x) => {
+				rowTotal += row[x - 1] ?? 0;
+				return (above[x] as number) + rowTotal;
+			}),
+		);
+	}
+	return prefix;
+};
+
+/** The sum of the cells from `(x0, y0)` to `(x1, y1)`, both corners included, from `prefixSums`. */
+export const rectSum = (
+	prefix: readonly (readonly number[])[],
+	x0: number,
+	y0: number,
+	x1: number,
+	y1: number,
+): number => {
+	const at = (x: number, y: number) => prefix[y]?.[x] ?? 0;
+	return at(x1 + 1, y1 + 1) - at(x0, y1 + 1) - at(x1 + 1, y0) + at(x0, y0);
+};
+
 export const findAll = (g: readonly (readonly string[])[], char: string): Point[] => {
 	const found: Point[] = [];
 	for (const [y, row] of g.entries()) {
