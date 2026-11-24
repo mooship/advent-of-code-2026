@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { chunk, combinations, pairs, permutations, transpose, windows } from "./arrays.ts";
-import { counter, DefaultMap, PriorityQueue } from "./collections.ts";
+import { counter, DefaultMap, memoize, PriorityQueue } from "./collections.ts";
 import { DIRS8, findAll, inBounds, manhattan, neighbors } from "./grid.ts";
 import { digitGrid, grid, ints, lines, paragraphs } from "./input.ts";
-import { gcd, lcm, mod, product, range, sum } from "./math.ts";
-import { bfs, dijkstra } from "./search.ts";
+import { crt, gcd, lcm, mergeRanges, mod, product, range, sum } from "./math.ts";
+import { bfs, dijkstra, iterate, topologicalSort } from "./search.ts";
 
 describe("input", () => {
 	it("splits lines and ignores CRLF and the trailing newline", () => {
@@ -145,6 +145,19 @@ describe("search", () => {
 			),
 		).toBe(2);
 	});
+
+	it("dijkstra with a heuristic is A* and finds the same cost", () => {
+		const target = 7;
+		const next = (n: number): [number, number][] => [
+			[n + 1, 1],
+			[n + 3, 2],
+		];
+		const isGoal = (n: number) => n === target;
+		const key = (n: number) => n;
+		const withoutHeuristic = dijkstra(0, next, isGoal, key);
+		const withHeuristic = dijkstra(0, next, isGoal, key, (n) => Math.max(0, target - n) / 1.5);
+		expect(withHeuristic).toBe(withoutHeuristic);
+	});
 });
 
 describe("arrays", () => {
@@ -177,5 +190,88 @@ describe("arrays", () => {
 		]);
 		expect([...combinations([1, 2, 3, 4], 2)]).toHaveLength(6);
 		expect([...permutations([1, 2, 3])]).toHaveLength(6);
+	});
+});
+
+describe("iterate", () => {
+	it("matches plain simulation, including past a cycle", () => {
+		const step = (n: number) => (n * 3 + 1) % 17;
+		const simulate = (steps: number) => {
+			let n = 5;
+			for (let i = 0; i < steps; i++) n = step(n);
+			return n;
+		};
+		for (const steps of [0, 1, 4, 30, 1000]) expect(iterate(5, step, steps)).toBe(simulate(steps));
+		expect(iterate(5, step, 1_000_000_000_000)).toBe(simulate((1_000_000_000_000 % 16) + 16));
+	});
+});
+
+describe("topologicalSort", () => {
+	it("puts dependencies first and rejects cycles", () => {
+		const order = topologicalSort(
+			new Map([
+				["a", ["b", "c"]],
+				["b", ["c"]],
+				["c", []],
+			]),
+		);
+		expect(order).toEqual(["c", "b", "a"]);
+		expect(() =>
+			topologicalSort(
+				new Map([
+					["a", ["b"]],
+					["b", ["a"]],
+				]),
+			),
+		).toThrow();
+	});
+});
+
+describe("mergeRanges and crt and memoize", () => {
+	it("merges overlapping and touching ranges", () => {
+		expect(
+			mergeRanges([
+				[5, 8],
+				[1, 3],
+				[4, 4],
+				[10, 12],
+				[2, 6],
+			]),
+		).toEqual([
+			[1, 8],
+			[10, 12],
+		]);
+	});
+
+	it("solves congruences, coprime or not", () => {
+		expect(
+			crt([
+				{ remainder: 2n, modulus: 3n },
+				{ remainder: 3n, modulus: 5n },
+				{ remainder: 2n, modulus: 7n },
+			]),
+		).toBe(23n);
+		expect(
+			crt([
+				{ remainder: 1n, modulus: 4n },
+				{ remainder: 3n, modulus: 6n },
+			]),
+		).toBe(9n);
+		expect(() =>
+			crt([
+				{ remainder: 1n, modulus: 4n },
+				{ remainder: 2n, modulus: 6n },
+			]),
+		).toThrow();
+	});
+
+	it("memoizes by arguments", () => {
+		let calls = 0;
+		const square = memoize((n: number) => {
+			calls++;
+			return n * n;
+		});
+		expect([square(3), square(3)]).toEqual([9, 9]);
+		expect(calls).toBe(1);
 	});
 });

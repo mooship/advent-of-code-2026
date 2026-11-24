@@ -68,3 +68,18 @@ export const counter = <T>(items: Iterable<T>): Map<T, number> => {
 	for (const item of items) counts.set(item, (counts.get(item) ?? 0) + 1);
 	return counts;
 };
+
+/** Caches results by `key`; pass your own when String(args) is not unique or is slow. */
+export const memoize = <Args extends unknown[], Result>(
+	compute: (...args: Args) => Result,
+	key: (...args: Args) => unknown = (...args) => args.join(","),
+): ((...args: Args) => Result) => {
+	const cache = new Map<unknown, Result>();
+	return (...args) => {
+		const cacheKey = key(...args);
+		if (cache.has(cacheKey)) return cache.get(cacheKey) as Result;
+		const result = compute(...args);
+		cache.set(cacheKey, result);
+		return result;
+	};
+};

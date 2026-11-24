@@ -6,7 +6,7 @@ TypeScript on Node 26, Biome, Vitest. This is a race: the goal is the fastest co
 
 1. **Right thing, right way, cleanly.** Solve the actual problem with the appropriate algorithm and write it properly the first time. No hacks, no "fix it later", no throwaway code that stays.
 2. **Correct on the first submit.** A wrong answer locks submissions for a growing time penalty. Never guess: pass the example, re-read the statement, then run the real input.
-3. **Speed comes from clarity.** Read the whole puzzle first, name the concepts in it, model them, then code. Use `src/lib` before writing a helper.
+3. **Speed comes from clarity.** Read the whole puzzle first, name the concepts in it, model them, then code. Use `src/lib` before writing a helper; the exports are listed under Commands, so don't open the files to find them.
 4. **Part 2 is usually a twist on part 1, but you haven't seen it yet.** Model the puzzle's real concepts and pass the obvious puzzle numbers (sizes, step counts) as arguments, so a twist is a small change. Do not guess at what part 2 will ask or build for it in advance.
 
 ## Clean code rules
@@ -44,12 +44,12 @@ Choose the right algorithm from the input size before writing code. A clean brut
 | Puzzle shape                                             | Reach for                                                |
 | -------------------------------------------------------- | -------------------------------------------------------- |
 | Shortest path, unweighted                                | `bfs`                                                    |
-| Cheapest path with weights                               | `dijkstra` (A* if a good heuristic exists)               |
-| "Simulate N steps", N huge                               | Cycle detection on the state                             |
-| Count ways / optimal choice with overlapping subproblems | Memoized recursion or DP                                 |
-| Ranges and intervals                                     | Sort, then merge or sweep                                |
-| Repeating cycles that must align                         | `lcm` / CRT                                              |
-| Dependencies / ordering                                  | Topological sort                                         |
+| Cheapest path with weights                               | `dijkstra` (pass `heuristic` for A*)                     |
+| "Simulate N steps", N huge                               | `iterate` (cycle detection on the state)                 |
+| Count ways / optimal choice with overlapping subproblems | `memoize` recursion or DP                                |
+| Ranges and intervals                                     | `mergeRanges`, or sort and sweep                         |
+| Repeating cycles that must align                         | `lcm` / `crt` (bigint)                                   |
+| Dependencies / ordering                                  | `topologicalSort`                                        |
 | Grids                                                    | `grid`, `neighbors`, `DIRS4`/`DIRS8` from `#lib/grid.ts` |
 | Counting items                                           | `counter` / `DefaultMap`                                 |
 
@@ -63,6 +63,10 @@ Choose the right algorithm from the input size before writing code. A clean brut
 6. Each solution is its own PR. Work on a `day-NN` branch off `main`. After both answers are accepted (the submit reports correct, or the user says so; not before), write the tests, review the diff, run `npm run check`, commit (`feat: solve day N`), push the branch and open a PR. Enable auto-merge (squash) so it lands once Lint, Build and Test pass. Don't push to `main` directly.
 
 Commands: `npm run solve -- N [--example] [--part 1|2]`, `npm run watch -- N`, `npm test`, `npm run test:watch`, `npm run check` (lint, build, library and script tests, same as CI), `npm run fix` (Biome autofix).
+
+`src/lib` exports: `input` (`lines`, `paragraphs`, `ints`, `grid`, `digitGrid`), `grid` (`Point`, `DIRS4`, `DIRS8`, `pointKey`, `inBounds`, `neighbors`, `manhattan`, `findAll`), `arrays` (`chunk`, `windows`, `transpose`, `pairs`, `combinations`, `permutations`), `math` (`sum`, `product`, `gcd`, `lcm`, `mod`, `range`, `mergeRanges`, `crt`), `collections` (`PriorityQueue`, `DefaultMap`, `counter`, `memoize`), `search` (`bfs`, `dijkstra`, `iterate`, `topologicalSort`), `types` (`Answer`).
+
+A pre-commit hook (lefthook) runs `biome check --write` on staged files and then `tsc --noEmit`, so formatting and safe lint fixes happen on commit; unfixable lint errors and type errors block it. Commits only happen after both answers are accepted, so the hook never slows solving.
 
 ## TypeScript and Node gotchas
 
