@@ -12,8 +12,6 @@ Needs [fnm](https://github.com/Schniz/fnm) (or any Node 26). `.node-version` sel
 eval "$(fnm env --use-on-cd --version-file-strategy recursive --shell zsh)"
 ```
 
-Commits should use your GitHub noreply address: `git config --local user.email <id>+<user>@users.noreply.github.com`.
-
 ```sh
 npm install
 npm run new -- 1           # scaffold src/days/day01

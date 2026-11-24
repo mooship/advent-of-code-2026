@@ -26,3 +26,47 @@ export const range = (start: number, end: number, step = 1): number[] => {
 	for (let i = start; step > 0 ? i < end : i > end; i += step) out.push(i);
 	return out;
 };
+
+/** Inclusive on both ends. */
+export type Range = readonly [start: number, end: number];
+
+/** Sorted, non-overlapping ranges; ranges that touch (end + 1 === next start) are joined. */
+export const mergeRanges = (ranges: readonly Range[]): Range[] => {
+	const merged: [number, number][] = [];
+	for (const [start, end] of [...ranges].sort((a, b) => a[0] - b[0])) {
+		const last = merged.at(-1);
+		if (last && start <= last[1] + 1) last[1] = Math.max(last[1], end);
+		else merged.push([start, end]);
+	}
+	return merged;
+};
+
+export type Congruence = { remainder: bigint; modulus: bigint };
+
+const modBig = (n: bigint, m: bigint): bigint => ((n % m) + m) % m;
+
+const extendedGcd = (a: bigint, b: bigint): { gcd: bigint; x: bigint } => {
+	let [oldR, r] = [a, b];
+	let [oldX, x] = [1n, 0n];
+	while (r !== 0n) {
+		const quotient = oldR / r;
+		[oldR, r] = [r, oldR - quotient * r];
+		[oldX, x] = [x, oldX - quotient * x];
+	}
+	return { gcd: oldR, x: oldX };
+};
+
+/** Smallest non-negative n with n % modulus === remainder for every congruence. Throws if none exists. */
+export const crt = (congruences: readonly Congruence[]): bigint => {
+	let [remainder, modulus] = [0n, 1n];
+	for (const next of congruences) {
+		const { gcd, x } = extendedGcd(modulus, next.modulus);
+		const difference = next.remainder - remainder;
+		if (difference % gcd !== 0n) throw new Error("congruences have no common solution");
+		const nextModulus = next.modulus / gcd;
+		remainder += modulus * modBig((difference / gcd) * x, nextModulus);
+		modulus *= nextModulus;
+		remainder = modBig(remainder, modulus);
+	}
+	return remainder;
+};

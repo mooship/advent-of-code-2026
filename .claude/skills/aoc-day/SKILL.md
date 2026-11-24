@@ -14,7 +14,6 @@ The day number is the skill argument, or ask once if it is missing.
 - `git switch main && git pull --ff-only`, then `git switch -c day-NN`. If the branch exists, switch to it.
 - `npm run new -- N` if `src/days/dayNN` does not exist.
 - The user fetches the input (`npm run fetch -- N --wait`). Never touch `.env`. If `input.txt` is missing when you need it, say so and wait.
-- `git config user.email` must end in `@users.noreply.github.com`. If it doesn't, ask the user for their GitHub noreply address and set it with `git config --local user.email`.
 
 ## Phase 1: part 1, race mode
 

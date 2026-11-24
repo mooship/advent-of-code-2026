@@ -12,6 +12,7 @@
 		"#lib/*": "./src/lib/*"
 	},
 	"scripts": {
+		"prepare": "lefthook install",
 		"new": "node scripts/new.ts",
 		"fetch": "node scripts/fetch.ts",
 		"submit": "node scripts/submit.ts",
@@ -28,6 +29,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "^2.6.8",
 		"@types/node": "^26.6.6",
+		"lefthook": "^2.2.2",
 		"typescript": "^7.0.2",
 		"vitest": "^5.1.1"
 	}
