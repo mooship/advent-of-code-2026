@@ -1,9 +1,13 @@
 import { PriorityQueue } from "./collections.ts";
 
-// Both searches dedupe states with `key`; pass your own when String(state) is not unique or is slow.
+/** Default state identity for `bfs`, `dijkstra` and `iterate`; pass your own `key` when String(state) is not unique or is slow. */
 const defaultKey = <T>(state: T): string => String(state);
 
-/** Fewest steps from start to a goal state, or -1 when unreachable. */
+/**
+ * Fewest steps from start to a goal state, or -1 when unreachable.
+ * @param next The states reachable in one step.
+ * @param key Identifies a state for deduplication.
+ */
 export function bfs<T>(
 	start: T,
 	next: (state: T) => Iterable<T>,
@@ -80,7 +84,10 @@ export function binarySearch(
 	return first > high ? undefined : first;
 }
 
-/** The state after `steps` applications of `step`, jumping over any cycle so `steps` may be huge. */
+/**
+ * The state after `steps` applications of `step`, jumping over any cycle so `steps` may be huge.
+ * @param key Identifies a state for cycle detection.
+ */
 export function iterate<T>(
 	start: T,
 	step: (state: T) => T,
@@ -103,7 +110,10 @@ export function iterate<T>(
 	return state;
 }
 
-/** Order where every node comes after its dependencies. Throws when there is a cycle. */
+/**
+ * Order where every node comes after its dependencies. Throws when there is a cycle.
+ * @param dependencies Maps each node to the nodes it depends on.
+ */
 export function topologicalSort<T>(dependencies: ReadonlyMap<T, readonly T[]>): T[] {
 	const sorted: T[] = [];
 	const state = new Map<T, "visiting" | "done">();

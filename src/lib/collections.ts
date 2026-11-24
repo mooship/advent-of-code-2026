@@ -1,16 +1,19 @@
+/** Binary min-heap: the item that sorts first under `compare` pops first. */
 export class PriorityQueue<T> {
 	private heap: T[] = [];
 	private compare: (a: T, b: T) => number;
 
-	// Lowest compare() result pops first.
+	/** @param compare Negative when `a` should pop before `b`, like an `Array.sort` comparator. */
 	constructor(compare: (a: T, b: T) => number) {
 		this.compare = compare;
 	}
 
+	/** Number of queued items. */
 	get size(): number {
 		return this.heap.length;
 	}
 
+	/** Adds `item`. O(log n). */
 	push(item: T): void {
 		const heap = this.heap;
 		heap.push(item);
@@ -23,6 +26,7 @@ export class PriorityQueue<T> {
 		}
 	}
 
+	/** Removes and returns the first item, or `undefined` when empty. O(log n). */
 	pop(): T | undefined {
 		const heap = this.heap;
 		const top = heap[0];
@@ -109,6 +113,7 @@ export class UnionFind {
 	}
 }
 
+/** A `Map` whose `get` creates and stores `make(key)` for a missing key instead of returning `undefined`. */
 export class DefaultMap<K, V> extends Map<K, V> {
 	private make: (key: K) => V;
 
@@ -123,6 +128,7 @@ export class DefaultMap<K, V> extends Map<K, V> {
 	}
 }
 
+/** Counts how many times each item occurs. */
 export const counter = <T>(items: Iterable<T>): Map<T, number> => {
 	const counts = new Map<T, number>();
 	for (const item of items) counts.set(item, (counts.get(item) ?? 0) + 1);
