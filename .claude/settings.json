@@ -2,11 +2,14 @@
 	"permissions": {
 		"allow": [
 			"Bash(npm run new *)",
+			"Bash(npm run start *)",
 			"Bash(npm run solve *)",
+			"Bash(npm run times)",
 			"Bash(npm run watch *)",
 			"Bash(wc *)",
 			"Bash(head *)",
-			"Bash(git branch *)",
+			"Bash(git branch --show-current)",
+			"Bash(git branch -vv)",
 			"Bash(npm run test)",
 			"Bash(npm run test -- *)",
 			"Bash(npm run test:ci)",
@@ -26,6 +29,32 @@
 			"Bash(gh pr view *)",
 			"Bash(gh pr merge --auto --squash)"
 		],
-		"ask": ["Bash(npm run submit *)"]
+		"ask": ["Bash(npm run submit *)"],
+		"deny": [
+			"Read(./.env*)",
+			"Read(./**/.env*)",
+			"Bash(curl *)",
+			"Bash(wget *)",
+			"Bash(git push --force*)",
+			"Bash(git push -f*)",
+			"Bash(git push origin main*)",
+			"Bash(git commit *--no-verify*)",
+			"Bash(git branch -D *)",
+			"Bash(git branch -d *)",
+			"Bash(rm -rf *)"
+		]
+	},
+	"hooks": {
+		"PreToolUse": [
+			{
+				"matcher": "Bash|Read",
+				"hooks": [
+					{
+						"type": "command",
+						"command": "node \"$CLAUDE_PROJECT_DIR/scripts/guard.ts\""
+					}
+				]
+			}
+		]
 	}
 }
