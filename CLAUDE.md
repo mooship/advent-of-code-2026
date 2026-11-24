@@ -27,7 +27,7 @@ These ideas matter here, but each one is applied only when the puzzle gives a co
 
 **Build the simplest thing that solves the puzzle as stated.** The simplest correct solution is also the quickest to write and the easiest to trust. Cleverness is for when the input size forces it. If two designs both work, take the one a reader follows in a single pass.
 
-**Nothing speculative, and this is the rule that matters most in a race.** No options nobody asked for, no generic frameworks, no interface with a single implementation, no helper "for later", no handling of inputs the puzzle says cannot occur. Part 2 is unlocked only after part 1 is solved, and small, well-shaped code is cheap to change then. The same goes for `src/lib`: it was seeded once with helpers that come up nearly every year, and it only grows when a helper has been needed twice. Write it in the day's own file first.
+**Nothing speculative, and this is the rule that matters most in a race.** No options nobody asked for, no generic frameworks, no interface with a single implementation, no helper "for later", no handling of inputs the puzzle says cannot occur. Part 2 is unlocked only after part 1 is solved, and small, well-shaped code is cheap to change then. The same goes for `src/lib`: it was seeded with helpers that come up nearly every year (the latest batch: `UnionFind`, `binarySearch`, `prefixSums`/`rectSum`, 3D points), and after that it only grows when a helper has been needed twice. Write it in the day's own file first and log it in `src/lib/CANDIDATES.md` at wrap-up, so the second day finds it.
 
 **Give each function one reason to change.** Parsing changes when the input format does, the solving logic when the puzzle's rules do, and `part1`/`part2` when how the parts differ does. Keeping these apart is what lets part 2 be a small edit.
 
@@ -52,19 +52,23 @@ Choose the right algorithm from the input size before writing code. A clean brut
 | Dependencies / ordering                                  | `topologicalSort`                                        |
 | Grids                                                    | `grid`, `neighbors`, `DIRS4`/`DIRS8` from `#lib/grid.ts` |
 | Counting items                                           | `counter` / `DefaultMap`                                 |
+| Groups that merge, connected components                  | `UnionFind`                                              |
+| Smallest value where a monotone condition holds          | `binarySearch`                                           |
+| Many rectangle sums over a grid                          | `prefixSums` + `rectSum`                                 |
+| 3D points and steps                                      | `Point3`, `DIRS6`, `manhattan3`                          |
 
 ## Workflow per day
 
-1. `npm run new -- N` scaffolds `src/days/dayNN/` (`solution.ts`, `solution.test.ts`, `example.txt`). Input is fetched with `npm run fetch -- N` (the user usually does this themselves).
+1. `npm run start -- N` does all of phase 0: fresh `main`, the `day-NN` branch, the scaffold in `src/days/dayNN/` (`solution.ts`, `solution.test.ts`, `example.txt`) and the input, waiting for the puzzle to unlock. `npm run new -- N` and `npm run fetch -- N` do their halves alone.
 2. The user pastes the puzzle text. Read all of it, including the examples and the edge cases in the prose (inclusive vs exclusive ends, 0 vs 1 indexing, "exactly", duplicates, ties).
 3. Put the puzzle's example in `example.txt`.
 4. Implement, check it with `npm run solve -- N --example` against the answer in the puzzle text, then run `npm run solve -- N` for the real answer. Real tests, lint and the PR wait until the answers are accepted (see the `aoc-day` skill for the full order).
 5. Give the user the answer plus one line on the method, then submit it with `npm run submit -- N <part> <answer>`. The permission prompt is the user's approval; never look for a way around it. Part 2: reuse and generalize, don't copy.
-6. Each solution is its own PR. Work on a `day-NN` branch off `main`. After both answers are accepted (the submit reports correct, or the user says so; not before), write the tests, review the diff, run `npm run check`, commit (`feat: solve day N`), push the branch and open a PR. Enable auto-merge (squash) so it lands once Lint, Build and Test pass. Don't push to `main` directly.
+6. Each solution is its own PR. Work on a `day-NN` branch off `main`. After both answers are accepted (the submit reports correct, or the user says so; not before), write the tests, run `npm run check`, commit (`feat: solve day N`), push the branch and open a PR. Run the `aoc-reviewer` agent on the diff in the background while pushing; apply only its important findings and never wait on it before the next day. Log any helper written inline in `src/lib/CANDIDATES.md`. Enable auto-merge (squash) so it lands once the `Check` job passes. Don't push to `main` directly.
 
-Commands: `npm run solve -- N [--example] [--part 1|2]`, `npm run watch -- N`, `npm test`, `npm run test:watch`, `npm run check` (lint, build, library and script tests, same as CI), `npm run fix` (Biome autofix).
+Commands: `npm run start -- N`, `npm run solve -- N [--example] [--part 1|2]`, `npm run watch -- N`, `npm run times` (per-part milliseconds for every day with an `input.txt`), `npm test`, `npm run test:watch`, `npm run check` (lint, build, library and script tests; CI's one `Check` job runs exactly this), `npm run fix` (Biome autofix).
 
-`src/lib` exports: `input` (`lines`, `paragraphs`, `ints`, `grid`, `digitGrid`), `grid` (`Point`, `DIRS4`, `DIRS8`, `pointKey`, `inBounds`, `neighbors`, `manhattan`, `findAll`), `arrays` (`chunk`, `windows`, `transpose`, `pairs`, `combinations`, `permutations`), `math` (`sum`, `product`, `gcd`, `lcm`, `mod`, `range`, `mergeRanges`, `crt`), `collections` (`PriorityQueue`, `DefaultMap`, `counter`, `memoize`), `search` (`bfs`, `dijkstra`, `iterate`, `topologicalSort`), `types` (`Answer`).
+`src/lib` exports: `input` (`lines`, `paragraphs`, `ints`, `grid`, `digitGrid`), `grid` (`Point`, `DIRS4`, `DIRS8`, `pointKey`, `inBounds`, `neighbors`, `manhattan`, `findAll`, `Point3`, `DIRS6`, `manhattan3`, `prefixSums`, `rectSum`), `arrays` (`chunk`, `windows`, `transpose`, `pairs`, `combinations`, `permutations`), `math` (`sum`, `product`, `gcd`, `lcm`, `mod`, `range`, `mergeRanges`, `crt`), `collections` (`PriorityQueue`, `UnionFind`, `DefaultMap`, `counter`, `memoize`), `search` (`bfs`, `binarySearch`, `dijkstra`, `iterate`, `topologicalSort`), `types` (`Answer`).
 
 A pre-commit hook (lefthook) runs `biome check --write` on staged files and then `tsc --noEmit`, so formatting and safe lint fixes happen on commit; unfixable lint errors and type errors block it. Commits only happen after both answers are accepted, so the hook never slows solving.
 
@@ -79,14 +83,14 @@ A pre-commit hook (lefthook) runs `biome check --write` on staged files and then
 
 ## Debugging a wrong answer
 
-Don't resubmit variations. Re-read the statement for a missed rule, check the example passes for both parts, then compare against a slower obviously-correct version on a small input. Say what was wrong and fix the cause.
+Follow the `aoc-wrong-answer` skill. Don't resubmit variations.
 
 ## Boundaries
 
 - Never commit puzzle inputs or puzzle text (`input.txt` and `example*.txt` are git-ignored). Examples go in the git-ignored file, not inline in tests.
 - Never read or print `.env` or the `AOC_SESSION` cookie, and never ask for it in chat.
 - Submit only through `npm run submit`, only an answer that passed the example check, and only with the user's approval at the permission prompt. It logs attempts in the git-ignored `.submissions.json` and refuses repeats and lockouts. After a wrong answer, tell the user the cause before submitting anything else. Never call the AoC answer endpoint any other way.
-- Only `npm run fetch` (once per day input) and `npm run submit` talk to adventofcode.com. Keep requests throttled and never loop them.
+- Only `npm run fetch` (once per day input, also run by `npm run start`) and `npm run submit` talk to adventofcode.com. Keep requests throttled and never loop them. A `PreToolUse` hook (`scripts/guard.ts`) and the deny list in `.claude/settings.json` block `.env`, `AOC_SESSION`, `adventofcode.com`, `curl` and `wget` everywhere else; do not work around them.
 - Personal repo: commit as the repo-local noreply identity, Conventional Commits (`feat: solve day 1`). Pushing a `day-NN` branch and opening its PR is pre-approved; never force-push or rewrite history.
 
 ## Style of replies during a race

@@ -14,12 +14,14 @@ eval "$(fnm env --use-on-cd --version-file-strategy recursive --shell zsh)"
 
 ```sh
 npm install
-npm run new -- 1           # scaffold src/days/day01
-npm run fetch -- 1         # download input (needs AOC_SESSION in .env, see .env.example)
+npm run start -- 1         # fresh main, day-01 branch, scaffold, then fetch the input (waits for unlock)
+npm run new -- 1           # scaffold src/days/day01 only
+npm run fetch -- 1         # download input only (needs AOC_SESSION in .env, see .env.example)
 npm run submit -- 1 1 42   # submit an answer for day 1 part 1 (asks for permission)
 npm run solve -- 1         # run both parts on input.txt; add --example for example.txt
 npm run watch -- 1         # same, re-running on save
-npm run check              # lint, build (tsc) and library and script tests, same as CI
+npm run times              # time every day that has an input.txt, per part
+npm run check              # lint, build (tsc) and library and script tests, the one CI job (Check)
 ```
 
 Puzzle inputs and example text are git-ignored, as Advent of Code asks.
